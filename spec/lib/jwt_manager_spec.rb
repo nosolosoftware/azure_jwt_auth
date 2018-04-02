@@ -11,10 +11,6 @@ RSpec.describe AzureJwtAuth::JwtManager do
   describe 'b2c authentication' do
     context 'when all is ok' do
       it 'works' do
-        # configure AzureJwtAuth
-        AzureJwtAuth.b2c_uri = b2c_uri
-        AzureJwtAuth.audience = audience
-
         # generate private/public rsa key
         rsa_private = OpenSSL::PKey::RSA.generate 2048
         rsa_public = rsa_private.public_key
@@ -25,19 +21,20 @@ RSpec.describe AzureJwtAuth::JwtManager do
         }
 
         # stub requests to Azure B2C
-        stub_request(:get, b2c_uri).
-          to_return(body: {'issuer' => issuer, 'jwks_uri' => jwks_uri}.to_json)
+        stub_request(:get, b2c_uri)
+          .to_return(body: {'issuer' => issuer, 'jwks_uri' => jwks_uri}.to_json)
         stub_request(:get, jwks_uri)
           .to_return(body: {'keys' => [key]}.to_json)
 
         # create jwt token
         payload = {'iss' => issuer, 'aud' => audience, 'exp' => Time.now.to_i + 4 * 3600}
-        token = JWT.encode(payload, rsa_private, 'RS256', {'kid' => kid})
+        token = JWT.encode(payload, rsa_private, 'RS256', 'kid' => kid)
 
         # Test that config is loaded
-        AzureJwtAuth::JwtManager.load_config
-        expect(AzureJwtAuth::JwtManager.b2c_config).to eq({"issuer"=> issuer, "jwks_uri"=> jwks_uri})
-        expect(AzureJwtAuth::JwtManager.b2c_keys[kid]).not_to be_nil
+        AzureJwtAuth::JwtManager.load_provider(:b2c, b2c_uri)
+        provider = AzureJwtAuth::JwtManager.providers[:b2c]
+        expect(provider.config).to eq('issuer' => issuer, 'jwks_uri' => jwks_uri)
+        expect(provider.keys[kid]).not_to be_nil
 
         # Test jwt decode and validation
         request = OpenStruct.new(env: {'HTTP_AUTHORIZATION' => token})
