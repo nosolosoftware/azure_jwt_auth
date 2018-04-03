@@ -7,3 +7,4 @@ gemspec
 
 gem 'rspec'
 gem 'webmock'
+gem 'rack'

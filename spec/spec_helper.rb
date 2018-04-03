@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'webmock/rspec'
-require 'azure_jwt_auth/authenticable'
 require 'json'
+require 'rack'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

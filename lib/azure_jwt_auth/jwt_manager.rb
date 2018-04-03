@@ -18,8 +18,8 @@ module AzureJwtAuth
     end
 
     def initialize(request, provider_id)
-      raise 'NOT AUTHORIZATION HEADER' unless request.env['HTTP_AUTHORIZATION']
-      raise 'PROVIDER NOT FOUND' unless (@provider = self.class.find_provider(provider_id))
+      raise NotAuthorizationHeader unless request.env['HTTP_AUTHORIZATION']
+      raise ProviderNotFound unless (@provider = self.class.find_provider(provider_id))
 
       @jwt = request.env['HTTP_AUTHORIZATION'].split.last # remove Bearer
       @jwt_info = decode
@@ -31,12 +31,7 @@ module AzureJwtAuth
 
     # Validates the payload hash for expiration and meta claims
     def valid?
-      payload && !expired? && iss_valid? && custom_valid?
-    end
-
-    # Validates if the token is expired by exp parameter
-    def expired?
-      Time.at(payload['exp']) < Time.now
+      payload && iss_valid? && custom_valid?
     end
 
     # Check custom validations defined into provider
@@ -63,8 +58,10 @@ module AzureJwtAuth
 
       begin
         rsa = @provider.keys[kid]
+        raise KidNotFound, 'kid not found into provider keys' unless rsa
+
         JWT.decode(@jwt, rsa.public_key, true, algorithm: 'RS256')
-      rescue JWT::VerificationError
+      rescue JWT::VerificationError, KidNotFound
         raise if try
 
         @provider.load_keys # maybe keys have been changed

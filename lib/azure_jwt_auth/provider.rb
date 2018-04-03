@@ -11,7 +11,12 @@ module AzureJwtAuth
       @config_uri = config_uri
       @validations = validations
 
-      @config = JSON.parse(Net::HTTP.get(URI(config_uri)))
+      begin
+        @config = JSON.parse(Net::HTTP.get(URI(config_uri)))
+      rescue JSON::ParserError
+        raise InvalidProviderConfig, "config_uri response is not valid for provider: #{uid}"
+      end
+
       load_keys
     end
 
