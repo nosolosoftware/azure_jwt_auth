@@ -8,10 +8,10 @@ Gem::Specification.new do |s|
   s.name        = 'azure_jwt_auth'
   s.version     = AzureJwtAuth::VERSION
   s.authors     = ['rjurado']
-  s.email       = ['rjurado@openmailbox.org']
-  s.homepage    = 'https://github.com/rjurado01/rails_jwt_auth'
-  s.summary     = 'Rails jwt authentication.'
-  s.description = 'Rails authentication solution using Azure B2C.'
+  s.email       = ['rjurado@nosolosoftware.es']
+  s.homepage    = 'https://github.com/nosolosoftware/azure_jwt_auth'
+  s.summary     = 'Azure B2C/AD authentication using Ruby.'
+  s.description = 'Easy way for Ruby applications to authenticate to Azure B2C/AD in order to access protected web resources.'
   s.license     = 'MIT'
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']

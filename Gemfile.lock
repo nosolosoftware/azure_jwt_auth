@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    azure_jwt_auth (0.1.0)
+    azure_jwt_auth (0.1.1)
       bcrypt (~> 3.1)
       jwt (~> 1.5)
       rsa-pem-from-mod-exp (~> 0.1)
