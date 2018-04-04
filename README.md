@@ -1,4 +1,5 @@
 # AzureJwtAuth
+![Build Status](https://travis-ci.org/nosolosoftware/azure_jwt_auth.svg?branch=master)
 
 Easy way for Ruby applications to authenticate to Azure B2C/AD in order to access protected web resources.
 
