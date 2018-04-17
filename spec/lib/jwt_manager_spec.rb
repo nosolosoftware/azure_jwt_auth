@@ -118,9 +118,8 @@ RSpec.describe AzureJwtAuth::JwtManager do
 
         # test jwt decode and validation
         request = OpenStruct.new(env: {'HTTP_AUTHORIZATION' => token})
-        expect {
-          AzureJwtAuth::JwtManager.new(request, :b2c)
-        }.to raise_error(AzureJwtAuth::KidNotFound)
+        jwt = AzureJwtAuth::JwtManager.new(request, :b2c)
+        expect { jwt.valid? }.to raise_error(AzureJwtAuth::KidNotFound)
       end
     end
 
@@ -137,9 +136,8 @@ RSpec.describe AzureJwtAuth::JwtManager do
 
         # test jwt decode and validation
         request = OpenStruct.new(env: {'HTTP_AUTHORIZATION' => token})
-        expect {
-          AzureJwtAuth::JwtManager.new(request, :b2c)
-        }.to raise_error(JWT::VerificationError)
+        jwt = AzureJwtAuth::JwtManager.new(request, :b2c)
+        expect { jwt.valid? }.to raise_error(JWT::VerificationError)
       end
     end
 

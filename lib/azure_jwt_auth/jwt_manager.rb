@@ -22,16 +22,20 @@ module AzureJwtAuth
       raise ProviderNotFound unless (@provider = self.class.find_provider(provider_id))
 
       @jwt = request.env['HTTP_AUTHORIZATION'].split.last # remove Bearer
-      @jwt_info = decode
+      @jwt_info = JWT.decode(@jwt, nil, false)
     end
 
     def payload
       @jwt_info ? @jwt_info.first : nil
     end
 
-    # Validates the payload hash for expiration and meta claims
-    def valid?
-      payload && iss_valid? && custom_valid?
+    def header
+      @jwt_info ? @jwt_info.last : nil
+    end
+
+    # Validates issuer
+    def iss_valid?
+      payload['iss'] == @provider.config['issuer']
     end
 
     # Check custom validations defined into provider
@@ -43,17 +47,16 @@ module AzureJwtAuth
       true
     end
 
-    # Validates issuer
-    def iss_valid?
-      payload['iss'] == @provider.config['issuer']
+    # Validates the payload hash for expiration and meta claims
+    def valid?
+      payload && iss_valid? && custom_valid? && rsa_decode
     end
 
     private
 
     # Decodes the JWT with the signed secret
-    def decode
-      dirty_token = JWT.decode(@jwt, nil, false)
-      kid = dirty_token.last['kid']
+    def rsa_decode
+      kid = header['kid']
       try = false
 
       begin
