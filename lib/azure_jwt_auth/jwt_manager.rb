@@ -35,7 +35,8 @@ module AzureJwtAuth
 
     # Validates issuer
     def iss_valid?
-      payload['iss'] == @provider.config['issuer']
+      payload['iss'] == @provider.config['issuer'] || # b2c
+        (payload['tid'] && @provider.config['issuer'] =~ /#{payload['tid']}/) # ac
     end
 
     # Check custom validations defined into provider

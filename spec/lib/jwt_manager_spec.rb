@@ -207,4 +207,26 @@ RSpec.describe AzureJwtAuth::JwtManager do
       end
     end
   end
+
+  describe '#iss_valid?' do
+    context 'when is active_directory jwt' do
+      it '' do
+        stub_request(:get, b2c_uri)
+          .to_return(body: {'issuer' => 'xxx/a3f9/v2', 'jwks_uri' => jwks_uri}.to_json)
+        stub_request(:get, jwks_uri)
+          .to_return(body: {'keys' => [key]}.to_json)
+
+        AzureJwtAuth::JwtManager.load_provider(:b2c, b2c_uri, aud: audience)
+
+        # create jwt token
+        payload = {'iss' => 'yyy/a3f9', 'tid' => 'a3f9', 'exp' => Time.now.to_i + 4 * 3600}
+        token = JWT.encode(payload, rsa_private, 'RS256', 'kid' => kid)
+
+        # test jwt decode and validation
+        request = OpenStruct.new(env: {'HTTP_AUTHORIZATION' => token})
+        jwt = AzureJwtAuth::JwtManager.new(request, :b2c)
+        expect(jwt.iss_valid?).to be_truthy
+      end
+    end
+  end
 end
