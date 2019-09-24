@@ -1,4 +1,4 @@
-require 'net/http'
+require 'net/https'
 require 'rsa_pem'
 
 module AzureJwtAuth
@@ -11,9 +11,15 @@ module AzureJwtAuth
       @config_uri = config_uri
       @validations = validations
 
+      http = Net::HTTP.new(URI(config_uri).host, URI(config_uri).port)
+
       begin
-	request = Net::HTTP::Get.new(URI(config_uri).request_uri)
-	@config = JSON.parse(http.request(request))
+	uri = URI.parse(config_uri)
+	http = Net::HTTP.new(uri.host, uri.port)
+	http.use_ssl = true
+	request = Net::HTTP::Get.new(uri.request_uri)
+	response = http.request(request)
+	@config = JSON.parse(response.body)
       rescue JSON::ParserError
         raise InvalidProviderConfig, "config_uri response is not valid for provider: #{uid}"
       end
@@ -23,8 +29,11 @@ module AzureJwtAuth
 
     def load_keys
       uri = URI(@config['jwks_uri'])
-      request = Net::HTTP::Get.new(URI(uri).request_uri)
-      keys = JSON.parse(http.request(request))['keys']
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
+      keys = JSON.parse(response.body)['keys']
 
       @keys = {}
       keys.each do |key|
