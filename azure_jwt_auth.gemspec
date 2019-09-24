@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   s.add_dependency 'bcrypt',                '~> 3.1'
-  s.add_dependency 'jwt',                   '~> 1.5'
+  s.add_dependency 'jwt',                   '~> 2.2'
   s.add_dependency 'rsa-pem-from-mod-exp',  '~> 0.1'
 end
