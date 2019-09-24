@@ -12,7 +12,8 @@ module AzureJwtAuth
       @validations = validations
 
       begin
-        @config = JSON.parse(Net::HTTP.get(URI(config_uri)))
+	request = Net:HTTP::Get.new(URI(config_uri).request_uri)
+	@config = JSON.parse(http.request(request))
       rescue JSON::ParserError
         raise InvalidProviderConfig, "config_uri response is not valid for provider: #{uid}"
       end
@@ -22,7 +23,8 @@ module AzureJwtAuth
 
     def load_keys
       uri = URI(@config['jwks_uri'])
-      keys = JSON.parse(Net::HTTP.get(uri))['keys']
+      request = Net:HTTP::Get.new(URI(uri).request_uri)
+      keys = JSON.parse(http.request(request))['keys']
 
       @keys = {}
       keys.each do |key|
