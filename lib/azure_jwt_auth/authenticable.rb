@@ -4,6 +4,7 @@ module AzureJwtAuth
   AzureJwtAuth::NotAuthorized = Class.new(StandardError)
 
   module Authenticable
+
     def current_user
       @current_user
     end
@@ -16,16 +17,16 @@ module AzureJwtAuth
       unauthorize! unless JwtManager.providers
 
       JwtManager.providers.each do |_uid, provider|
-        token = JwtManager.new(request, provider.uid)
-
-        if token.valid?
-          @current_user = entity_from_token_payload(token.payload)
-          break
+	begin
+          token = JwtManager.new(request, provider.uid)
+          if token.valid?
+            @current_user = entity_from_token_payload(token.payload)
+            break
+          end
+	rescue => error
+	  Rails.logger.info(error) if defined? Rails
         end
-      rescue => error
-        Rails.logger.info(error) if defined? Rails
       end
-
       unauthorize! unless @current_user
     end
 
