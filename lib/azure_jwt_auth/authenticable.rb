@@ -4,7 +4,6 @@ module AzureJwtAuth
   AzureJwtAuth::NotAuthorized = Class.new(StandardError)
 
   module Authenticable
-
     def current_user
       @current_user
     end
