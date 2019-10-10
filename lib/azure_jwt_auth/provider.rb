@@ -1,4 +1,4 @@
-require 'net/https'
+require 'net/http'
 require 'rsa_pem'
 
 module AzureJwtAuth
