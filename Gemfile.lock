@@ -18,7 +18,7 @@ GEM
     hashdiff (0.3.7)
     jwt (1.5.6)
     public_suffix (3.0.2)
-    rack (2.0.4)
+    rack (2.0.7)
     rake (12.3.1)
     rsa-pem-from-mod-exp (0.1.0)
     rspec (3.7.0)
